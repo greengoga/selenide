@@ -15,116 +15,115 @@ import static com.codeborne.selenide.Condition.*;
 
 class AppCardDeliveryTest {
 
+
     private String generateDate(int days, String pattern) {
         return LocalDate.now().plusDays(days).format(DateTimeFormatter.ofPattern(pattern));
     }
 
+    String planningDate = generateDate(3, "dd.MM.yyyy");
+
     @Test
     void shouldSubmitSuccessfully() {
-        String planningDate = generateDate(3, "dd.MM.yyyy");
         open("http://localhost:9999");
-        $("div .input[data-test-id='city'] .input__control").setValue("Санкт-Петербург");
-        $("div .calendar-input .input__control").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
-        $("div .calendar-input .input__control").setValue(planningDate);
-        $("div .input[data-test-id='name'] .input__control").setValue("вася пупкин");
-        $("div .input[data-test-id='phone'] .input__control").setValue("+79219998877");
-        $("div .checkbox[data-test-id='agreement']").click();
-        $("div .button").click();
-        $(Selectors.withText("Успешно!")).shouldBe(Condition.visible, Duration.ofSeconds(15));
+        $("[data-test-id='city'] input").setValue("Санкт-Петербург");
+        $("[data-test-id='date'] input").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(planningDate);
+        $("[data-test-id='name'] input").setValue("вася пупкин");
+        $("[data-test-id='phone'] input").setValue("+79219998877");
+        $("[data-test-id='agreement']").click();
+        $(".button").click();
+        $("[data-test-id='notification'] .notification__title").shouldBe(visible, Duration.ofSeconds(15)).shouldHave(text("Успешно!"));
+        $("[data-test-id='notification'] .notification__content").shouldHave(exactText("Встреча успешно забронирована на " + planningDate));
     }
 
     @Test
     void shouldFailIfCityEmpty() {
-        String planningDate = generateDate(3, "dd.MM.yyyy");
         open("http://localhost:9999");
-        $("div .calendar-input .input__control").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
-        $("div .calendar-input .input__control").setValue(planningDate);
-        $("div .input[data-test-id='name'] .input__control").setValue("вася пупкин");
-        $("div .input[data-test-id='phone'] .input__control").setValue("+79219998877");
-        $("div .checkbox[data-test-id='agreement']").click();
-        $("div .button").click();
-        $(Selectors.withText("Поле обязательно для заполнения")).shouldBe(Condition.visible);
+        $("[data-test-id='date'] input").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(planningDate);
+        $("[data-test-id='name'] input").setValue("вася пупкин");
+        $("[data-test-id='phone'] input").setValue("+79219998877");
+        $("[data-test-id='agreement']").click();
+        $(".button").click();
+        $("[data-test-id='city'].input_invalid").shouldHave(exactText("Поле обязательно для заполнения"));
     }
 
     @Test
     void shouldFailIfDateEmpty() {
         open("http://localhost:9999");
-        $("div .input[data-test-id='city'] .input__control").setValue("Санкт-Петербург");
-        $("div .calendar-input .input__control").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
-        $("div .input[data-test-id='name'] .input__control").setValue("вася пупкин");
-        $("div .input[data-test-id='phone'] .input__control").setValue("+79219998877");
-        $("div .checkbox[data-test-id='agreement']").click();
-        $("div .button").click();
-        $(Selectors.withText("Неверно введена дата")).shouldBe(Condition.visible);
+        $("[data-test-id='city'] input").setValue("Санкт-Петербург");
+        $("[data-test-id='date'] input").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        $("[data-test-id='name'] input").setValue("вася пупкин");
+        $("[data-test-id='phone'] input").setValue("+79219998877");
+        $("[data-test-id='agreement']").click();
+        $(".button").click();
+        $("[data-test-id='date'] .input_invalid").shouldHave(exactText("Неверно введена дата"));
     }
 
     @Test
     void shouldFailIfNameEmpty() {
-        String planningDate = generateDate(3, "dd.MM.yyyy");
         open("http://localhost:9999");
-        $("div .input[data-test-id='city'] .input__control").setValue("Санкт-Петербург");
-        $("div .calendar-input .input__control").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
-        $("div .calendar-input .input__control").setValue(planningDate);
-        $("div .input[data-test-id='phone'] .input__control").setValue("+79219998877");
-        $("div .checkbox[data-test-id='agreement']").click();
-        $("div .button").click();
-        $(Selectors.withText("Поле обязательно для заполнения")).shouldBe(Condition.visible);
+        $("[data-test-id='city'] input").setValue("Санкт-Петербург");
+        $("[data-test-id='date'] input").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(planningDate);
+        $("[data-test-id='phone'] input").setValue("+79219998877");
+        $("[data-test-id='agreement']").click();
+        $(".button").click();
+        $("[data-test-id='name'].input_invalid").shouldHave(text("Поле обязательно для заполнения"));
     }
 
     @Test
     void shouldFailIfPhoneEmpty() {
-        String planningDate = generateDate(3, "dd.MM.yyyy");
         open("http://localhost:9999");
-        $("div .input[data-test-id='city'] .input__control").setValue("Санкт-Петербург");
-        $("div .calendar-input .input__control").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
-        $("div .calendar-input .input__control").setValue(planningDate);
-        $("div .input[data-test-id='name'] .input__control").setValue("вася пупкин");
-        $("div .checkbox[data-test-id='agreement']").click();
-        $("div .button").click();
-        $(Selectors.withText("Поле обязательно для заполнения")).shouldBe(Condition.visible);
+        $("[data-test-id='city'] input").setValue("Санкт-Петербург");
+        $("[data-test-id='date'] input").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(planningDate);
+        $("[data-test-id='name'] input").setValue("вася пупкин");
+        $("[data-test-id='agreement']").click();
+        $(".button").click();
+        $("[data-test-id='phone'].input_invalid").shouldHave(text("Поле обязательно для заполнения"));
     }
 
     @Test
     void shouldFailIfCheckboxUnchecked() {
-        String planningDate = generateDate(3, "dd.MM.yyyy");
         open("http://localhost:9999");
-        $("div .input[data-test-id='city'] .input__control").setValue("Санкт-Петербург");
-        $("div .calendar-input .input__control").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
-        $("div .calendar-input .input__control").setValue(planningDate);
-        $("div .input[data-test-id='name'] .input__control").setValue("вася пупкин");
-        $("div .input[data-test-id='phone'] .input__control").setValue("+79219998877");
-        $("div .button").click();
+        $("[data-test-id='city'] input").setValue("Санкт-Петербург");
+        $("[data-test-id='date'] input").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        $("[data-test-id='date'] input").setValue(planningDate);
+        $("[data-test-id='name'] input").setValue("вася пупкин");
+        $("[data-test-id='phone'] input").setValue("+79219998877");
+        $(".button").click();
         $(".checkbox.input_invalid").shouldBe(visible);
     }
 
-    @Test
-    void shouldChooseCityByTwoLetters() {
-        String planningDate = generateDate(3, "dd.MM.yyyy");
-        open("http://localhost:9999");
-        $("div .input[data-test-id='city'] .input__control").setValue("Са");
-//        $$("span.menu-item__control").findBy(Condition.text("Санкт-Петербург")).click();
-        $(By.xpath("//span[text()='Санкт-Петербург']")).click();
-        $("div .calendar-input .input__control").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
-        $("div .calendar-input .input__control").setValue(planningDate);
-        $("div .input[data-test-id='name'] .input__control").setValue("вася пупкин");
-        $("div .input[data-test-id='phone'] .input__control").setValue("+79219998877");
-        $("div .checkbox[data-test-id='agreement']").click();
-        $("div .button").click();
-        $(Selectors.withText("Успешно!")).shouldBe(Condition.visible, Duration.ofSeconds(15));
-    }
+//    @Test
+//    void shouldChooseCityByTwoLetters() {
+//        open("http://localhost:9999");
+//        $("div .input[data-test-id='city'] .input__control").setValue("Са");
+//        $$(".popup .menu-item").findBy(Condition.text("Санкт-Петербург")).click();
+//        $("[data-test-id='date'] input").press(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+//        $("[data-test-id='date'] input").setValue(planningDate);
+//        $("[data-test-id='name'] input").setValue("вася пупкин");
+//        $("[data-test-id='phone'] input").setValue("+79219998877");
+//        $("[data-test-id='agreement']").click();
+//        $(".button").click();
+//        $("[data-test-id='notification'] .notification__title").shouldBe(visible, Duration.ofSeconds(15)).shouldHave(text("Успешно!"));
+//        $("[data-test-id='notification'] .notification__content").shouldHave(exactText("Встреча успешно забронирована на " + planningDate));
+//    }
 
     @Test
-    void shouldPickWeekAheadWithPopupCalendar() {
-        String planningDate = generateDate(7, "d");
+    void shouldPickWeekAheadWithPopupCalendarAndCityByTwoLetters() {
         open("http://localhost:9999");
-        $("div .input[data-test-id='city'] .input__control").setValue("Са");
-        $$("span.menu-item__control").findBy(Condition.text("Санкт-Петербург")).click();
-        $("div .icon-button").click();
-        $("div.calendar").$(Selectors.byText(planningDate)).click();
-        $("div .input[data-test-id='name'] .input__control").setValue("вася пупкин");
-        $("div .input[data-test-id='phone'] .input__control").setValue("+79219998877");
-        $("div .checkbox[data-test-id='agreement']").click();
-        $("div .button").click();
-        $(Selectors.withText("Успешно!")).shouldBe(Condition.visible, Duration.ofSeconds(15));
+        $("[data-test-id='city'] input").setValue("Са");
+        $$(".popup .menu-item").findBy(Condition.text("Санкт-Петербург")).click();
+        $(".icon-button").click();
+        if(!generateDate(3,"MM").equals((generateDate(7, "MM")))) $(" .calendar__arrow_direction_right[data-step='1']").click();
+        $$(".calendar__day").findBy(Condition.text(generateDate(7, "d"))).click();
+        $("[data-test-id='name'] input").setValue("вася пупкин");
+        $("[data-test-id='phone'] input").setValue("+79219998877");
+        $("[data-test-id='agreement']").click();
+        $(".button").click();
+        $("[data-test-id='notification'] .notification__title").shouldBe(visible, Duration.ofSeconds(15)).shouldHave(text("Успешно!"));
+        $("[data-test-id='notification'] .notification__content").shouldHave(exactText("Встреча успешно забронирована на " + generateDate(7, "dd.MM.yyyy")));
     }
 }
